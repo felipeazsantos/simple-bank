@@ -21,4 +21,7 @@ test:
 fixdata:
 	sudo chmod 777 -R data
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test
+server:
+	go run main.go
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test fixdata server
