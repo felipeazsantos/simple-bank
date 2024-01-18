@@ -6,6 +6,7 @@ import (
 
 	db "github.com/felipeazsantos/simple_bank/db/sqlc"
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 )
 
 type createAccountRequest struct {
@@ -28,6 +29,13 @@ func (server *Server) createAccount(ctx *gin.Context) {
 
 	account, err := server.store.CreateAccount(ctx, arg)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			switch pqErr.Code.Name() {
+			case "foreign_key_violation", "unique_violation":
+				ctx.JSON(http.StatusForbidden, errorResponse(err))
+				return
+			}
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
@@ -61,7 +69,7 @@ func (server *Server) getAccount(ctx *gin.Context) {
 }
 
 type listAccountRequest struct {
-	PageID int32 `form:"page_id" binding:"required,min=1"`
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
@@ -73,7 +81,7 @@ func (server *Server) listAccount(ctx *gin.Context) {
 	}
 
 	arg := db.ListAccountsParams{
-		Limit: req.PageSize,
+		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	}
 
