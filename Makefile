@@ -22,4 +22,7 @@ test:
 server:
 	go run main.go
 
+fixpgdata:
+	sudo chmod 777 -R pgdata
+
 .PHONY: createdb dropdb postgres migrateup migratedown sqlc test server
