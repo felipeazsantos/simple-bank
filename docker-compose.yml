@@ -1,0 +1,15 @@
+services:
+  postgres12_sb:
+    image: postgres:12
+    ports:
+      - "5442:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: simple_bank?sslmode=disable
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+
+volumes:
+  pgdata:

@@ -25,4 +25,7 @@ server:
 fixpgdata:
 	sudo chmod 777 -R pgdata
 
-.PHONY: createdb dropdb postgres migrateup migratedown sqlc test server
+mock:
+	mockgen -package mockdb -destination db/mock/Store.go  github.com/felipeazsantos/simple_bank/db/sqlc Store
+
+.PHONY: createdb dropdb postgres migrateup migratedown sqlc test server mock
