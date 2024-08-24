@@ -34,6 +34,7 @@ func (server *Server) createAccount(ctx *gin.Context) {
 			case "foreign_key_violation", "unique_violation":
 				ctx.JSON(http.StatusBadRequest, errorResponse(err))
 				return
+			}
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
