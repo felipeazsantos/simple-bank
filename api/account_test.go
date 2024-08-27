@@ -20,17 +20,16 @@ import (
 func TestGetAccountAPI(t *testing.T) {
 	account := randomAccount()
 
-
-	testsCases := []struct{
-		name string
-		accountID int64
-		buildStubs func(store *mockdb.MockStore)
+	testsCases := []struct {
+		name          string
+		accountID     int64
+		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
-			name: "OK",
+			name:      "OK",
 			accountID: account.ID,
-			buildStubs: func (store *mockdb.MockStore)  {
+			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
 					Times(1).
@@ -42,9 +41,9 @@ func TestGetAccountAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "NotFound",
+			name:      "NotFound",
 			accountID: account.ID,
-			buildStubs: func (store *mockdb.MockStore)  {
+			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
 					Times(1).
@@ -55,9 +54,9 @@ func TestGetAccountAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InternalError",
+			name:      "InternalError",
 			accountID: account.ID,
-			buildStubs: func (store *mockdb.MockStore)  {
+			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
 					Times(1).
@@ -68,9 +67,9 @@ func TestGetAccountAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidID",
+			name:      "InvalidID",
 			accountID: 0,
-			buildStubs: func (store *mockdb.MockStore)  {
+			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetAccount(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -79,8 +78,7 @@ func TestGetAccountAPI(t *testing.T) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
-	} 
-
+	}
 
 	for i := range testsCases {
 		tc := testsCases[i]
@@ -93,8 +91,8 @@ func TestGetAccountAPI(t *testing.T) {
 			// build stubs
 			tc.buildStubs(store)
 
-			// start test server and send request 
-			server := NewServer(store)
+			// start test server and send request
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/accounts/%d", tc.accountID)
@@ -105,9 +103,9 @@ func TestGetAccountAPI(t *testing.T) {
 			// check the response
 			tc.checkResponse(t, recorder)
 		})
-		
+
 	}
-	
+
 }
 
 func randomAccount() db.Account {
