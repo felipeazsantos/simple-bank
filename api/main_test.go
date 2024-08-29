@@ -1,6 +1,8 @@
 package api
 
 import (
+	"database/sql"
+	"log"
 	"os"
 	"testing"
 	"time"
@@ -11,12 +13,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var config util.Config
+const (
+	DBSource = "postgresql://root:secret@localhost:5442/simple_bank?sslmode=disable"
+	DBDriver = "postgres"
+)
+
+var testQueries *db.Queries
+var testDB *sql.DB
 
 func newTestServer(t *testing.T, store db.Store) *Server {
 	config := util.Config{
 		TokenSymmetricKey:   util.RandomString(32),
 		AccessTokenDuration: time.Minute,
+		DBDriver:            DBDriver,
+		DBSource:            DBSource,
 	}
 
 	server, err := NewServer(config, store)
@@ -27,5 +37,12 @@ func newTestServer(t *testing.T, store db.Store) *Server {
 func TestMain(m *testing.M) {
 	gin.SetMode(gin.TestMode)
 
+	var err error
+	testDB, err = sql.Open(DBDriver, DBSource)
+	if err != nil {
+		log.Fatal("cannot connect to database", err)
+	}
+
+	testQueries = db.New(testDB)
 	os.Exit(m.Run())
 }
