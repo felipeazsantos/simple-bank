@@ -7,8 +7,6 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=simple_bank
-    volumes:
-      - /home/felipe/Documentos/dev_lab/simple_bank/pgdata:/var/lib/postgresql/data
   api:
     build:
       context: .
@@ -19,6 +17,6 @@ services:
       - DB_SOURCE=postgresql://root:secret@postgres12_sb:5432/simple_bank?sslmode=disable
     depends_on:
       - postgres12_sb
+    # entrypoint: ["/app/wait-for.sh", "postgres12_sb:5432", "--", "/app/start.sh"]
+    # command: [ "/app/main" ]
 
-volumes:
-  pgdata:
