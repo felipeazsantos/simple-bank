@@ -47,15 +47,24 @@ func NewJWTClaims(username string, duration time.Duration) (*jwt.MapClaims, erro
 }
 
 // CreateToken creates a new token for a specific username and duration
-func (maker *JWTMaker) CreateToken(username string, duration time.Duration) (string, error) {
+func (maker *JWTMaker) CreateToken(username string, duration time.Duration) (string, *Payload, error) {
 	var err error
 	maker.claims, err = NewJWTClaims(username, duration)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, maker.claims)
-	return jwtToken.SignedString([]byte(maker.secretKey))
+	token, err := jwtToken.SignedString([]byte(maker.secretKey))
+	if err != nil {
+		return "", nil, err
+	}
+
+	payload, err := NewPayload(username, duration)
+	if err != nil {
+		return "", nil, err
+	}
+	return token, payload, nil
 }
 
 // VerifyToken checks if the token is valid or not
