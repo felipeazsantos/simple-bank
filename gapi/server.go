@@ -11,7 +11,7 @@ import (
 
 // Server serves gRPC requests for our baking service
 type Server struct {
-	pb.UnimplementedSimpleBankServer
+	pb.SimpleBankServer
 	config     util.Config
 	store      db.Store
 	tokenMaker token.Maker
